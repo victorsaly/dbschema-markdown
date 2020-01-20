@@ -61,6 +61,7 @@ Options:
 
 
 <!-- START dbSchema-markdown -->
+
 # Database **Demo**
 
 ## dbo.Logs
@@ -70,11 +71,13 @@ Options:
 | Logs | ID  | int() | false |  |  | PRIMARY KEY |
 | Logs | Created  | datetime() | true | (getdate()) |  |  |
 ## dbo.Users
-This is a demo, Additional Information about the Table      
+This is a demo, Additional Information about the Table 
+
 | Name | Column | Type | Nullable | Default | Example | Comments    |
 |------|--------|:------------:|---------:|---------|---------|-------------|
 | Users | ID  | int() | false |  | Primary Key | PRIMARY KEY |
 | Users | Name  | varchar(50) | false |  | Full Name |  |
+
 <!-- END dbSchema-markdown -->
 
 
