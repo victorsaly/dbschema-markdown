@@ -1,0 +1,27 @@
+{
+  "name": "dbschema-markdown",
+  "version": "0.0.1",
+  "description": "A CLI to bootstrap SQL Schema in Markdown",
+  "main": "src/index.js",
+  "repository": {
+    "url": "https://gihub.com/victorsaly/dbschema-markdown"
+  },
+  "bin": {
+    "dbschema-markdown": "bin/dbschema-markdown"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "arg": "^4.1.2",
+    "ejs": "^3.0.1",
+    "esm": "^3.2.25",
+    "mssql": "^6.0.1"
+  },
+  "keywords": [
+    "cli",
+    "dbschema-markdown"
+  ],
+  "author": "Victor Saly",
+  "license": "MIT"
+}
