@@ -14,7 +14,7 @@ in an easily explorable document.
 
 
 ```console
-$ npm install dbschema-markdown --save-dev
+$ npm install dbschema-markdown -g
 ```
 
 ## Usage
