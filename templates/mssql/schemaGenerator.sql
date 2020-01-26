@@ -14,7 +14,7 @@ SELECT DISTINCT
                        END
                    ) AS [isNullable],
             c.CHARACTER_MAXIMUM_LENGTH AS [maxLength],
-            c.NUMERIC_PRECISION AS [precision],
+            case when c.DATETIME_PRECISION > 0 then c.DATETIME_PRECISION else c.NUMERIC_PRECISION end AS [precision],			
             c.NUMERIC_SCALE AS [scale],
             c.DATA_TYPE AS [sqlType],
             tc.CONSTRAINT_NAME AS [constraintName],
@@ -25,7 +25,11 @@ SELECT DISTINCT
                     SELECT TOP 1
                            STUFF(
                            (
-                               SELECT ',' + o.[name]
+						   
+
+                               SELECT '{' + (select top(1) _ccu.TABLE_NAME + '.' + _ccu.COLUMN_NAME + '}'
+							   FROM  INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE _ccu 
+							   where _ccu.CONSTRAINT_NAME = fk.[name])
                                FROM sys.objects AS o
                                    INNER JOIN sys.foreign_keys AS fk
                                        ON o.object_id = fk.parent_object_id
@@ -36,7 +40,7 @@ SELECT DISTINCT
                                FOR XML PATH('')
                            ),
                            1,
-                           1,
+                           0,
                            ''
                                 ) AS listStr
                     FROM sys.objects AS o
@@ -53,8 +57,10 @@ SELECT DISTINCT
             CASE
                 WHEN tc.CONSTRAINT_TYPE = 'FOREIGN KEY' THEN
                 (
+
+
                     SELECT TOP 1
-                           t.name
+                           t.name 
                     FROM sys.foreign_keys AS f
                         INNER JOIN sys.foreign_key_columns AS fc
                             ON f.object_id = fc.constraint_object_id
@@ -65,7 +71,17 @@ SELECT DISTINCT
                 ELSE
                     NULL
             END AS [constraintTable],
-            ccu.COLUMN_NAME AS [constraintColumn],
+            CASE
+                WHEN tc.CONSTRAINT_TYPE = 'FOREIGN KEY' THEN
+                (
+				SELECT top(1) _ccu.COLUMN_NAME
+			  FROM INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE _ccu LEFT JOIN INFORMATION_SCHEMA.TABLE_CONSTRAINTS _tc
+             ON _tc.CONSTRAINT_NAME = _ccu.CONSTRAINT_NAME
+			 where _ccu.TABLE_NAME=ccu.TABLE_NAME and _tc.CONSTRAINT_TYPE='Primary Key'
+				 )
+                ELSE
+					ccu.COLUMN_NAME
+            END AS[constraintColumn],
             (  select
              sep.value [Description]
          from sys.tables st
@@ -100,7 +116,5 @@ SELECT DISTINCT
            AND t.TABLE_NAME NOT LIKE 'webpages_%'
            AND t.TABLE_NAME NOT LIKE '%Raw%'
            AND t.TABLE_NAME NOT LIKE '\_%' ESCAPE '\'
-     --AND tc.CONSTRAINT_TYPE='PRIMARY KEY'
-     --AND t.TABLE_NAME ='Ticket'
      ORDER BY [name],
               [order];
