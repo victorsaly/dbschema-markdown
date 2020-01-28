@@ -5,7 +5,7 @@
 <% columns.forEach(column => { _%>
 | <%= column.column %>  | <%= 
       column.sqlType %><%= 
-      column.maxLength == null && column.precision == null ? '' : '(' %><%= column.maxLength > null ? column.maxLength : (column.precision == null ? '' :  column.precision) %><%= column.maxLength == null && column.precision == null ? '' : ')' %> <%- column.isNullable ? '<br> `nullable`':'' %> | <% 
+      column.maxLength == null && column.precision == null ? '' : '(' %><%= column.maxLength > null ? column.maxLength : (column.precision == null ? '' :  column.precision) %><%= column.maxLength == null && column.precision == null ? '' : ')' %> <%- column.isNullable ? '<br> `nullable`':'' %><%- column.isComputed ? '<br> `Computed`':'' %> | <% 
      column.constraints.forEach((constraint, key, arr) => { %><%-
      constraint.constraintType == null ? '' : 
      ((constraint.constraintType.charAt(0).toUpperCase() + constraint.constraintType.slice(1).toLowerCase() + ''
