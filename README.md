@@ -1,6 +1,6 @@
 <div align="center">
 
-# dbschema-markdown
+# dblookup-markdown
 
 **The easiest way to document your Database schema.**
 
@@ -14,39 +14,39 @@ in an easily explorable document.
 
 
 ```console
-$ npm install dbschema-markdown -g
+$ npm install dblookup-markdown -g
 ```
 
 ## Usage
 
 ### Command Line API
 
-Installing the package adds a `dbschema-markdown` script. Point it at a schema
+Installing the package adds a `dblookup-markdown` script. Point it at a schema
 and the output will be written to stdout.
 
 The schema may be retrieved from a Database endpoint:
 
 ```console
-$ dbschema-markdown "Data Source=SERVER\INSTANCE;Initial Catalog=Demo;Persist Security Info=True;User ID=APP_Demo;password=XXXXX" > schema.md
+$ dblookup-markdown "Data Source=SERVER\INSTANCE;Initial Catalog=Demo;Persist Security Info=True;User ID=APP_Demo;password=XXXXX" > schema.md
 ```
 
 …or update existing file:
 
 ```console
-$ dbschema-markdown "Data Source=SERVER\INSTANCE;Initial Catalog=Demo;Persist Security Info=True;User ID=APP_Demo;password=XXXXX" -u "./schema.md"
+$ dblookup-markdown "Data Source=SERVER\INSTANCE;Initial Catalog=Demo;Persist Security Info=True;User ID=APP_Demo;password=XXXXX" -u "./schema.md"
 ```
 
 If `--update-file` is given, the generated Markdown will be output to the given
-file between the `<!-- START dbschema-markdown -->` and `<!-- END dbschema-markdown -->`
+file between the `<!-- START dblookup-markdown -->` and `<!-- END dblookup-markdown -->`
 comment markers instead of printed to STDOUT. If the file does not exist, it
 will be created (and will include the comment markers for future updates).
 
 #### Options
 
 ```console
-$ dbschema-markdown --help
+$ dblookup-markdown --help
 
-Usage: dbschema-markdown [options] <connectionString>
+Usage: dblookup-markdown [options] <connectionString>
 
 Output a Markdown document 
 
@@ -60,7 +60,7 @@ Options:
 ## Output
 
 
-<!-- START dbSchema-markdown -->
+<!-- START dblookup-markdown -->
 
 # Database **Demo**
 
@@ -78,7 +78,7 @@ This is a demo, Additional Information about the Table
 | Users | ID  | int() | false |  | Primary Key | PRIMARY KEY |
 | Users | Name  | varchar(50) | false |  | Full Name |  |
 
-<!-- END dbSchema-markdown -->
+<!-- END dblookup-markdown -->
 
 
 [example]: https://github.com/exogen/graphbrainz/blob/master/docs/types.md

@@ -1,13 +1,13 @@
 {
-  "name": "dbschema-markdown",
+  "name": "dblookup-markdown",
   "version": "0.0.5",
   "description": "A CLI to bootstrap DB Schema in Markdown",
   "main": "src/index.js",
   "repository": {
-    "url": "https://github.com/victorsaly/dbschema-markdown"
+    "url": "https://github.com/victorsaly/dblookup-markdown"
   },
   "bin": {
-    "dbschema-markdown": "bin/dbschema-markdown"
+    "dblookup-markdown": "bin/dblookup-markdown"
   },
   "publishConfig": {
     "access": "public"
@@ -16,14 +16,15 @@
     "arg": "^4.1.2",
     "ejs": "^3.0.1",
     "esm": "^3.2.25",
-    "mssql": "^6.0.1"
+    "mssql": "^6.0.1",
+    "tablemark": "^2.0.0"
   },
   "devDependencies": {
     "pako": "^1.0.10"
   },
   "keywords": [
     "cli",
-    "dbschema-markdown"
+    "dblookup-markdown"
   ],
   "author": "Victor Saly",
   "license": "MIT"

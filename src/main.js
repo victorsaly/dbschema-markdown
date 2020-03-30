@@ -1,11 +1,13 @@
 import { renderFile } from 'ejs';
 import { readFileSync, existsSync, writeFileSync } from 'fs';
-import { deflate } from 'pako';
+import tablemark from 'tablemark';
+
+
 /**
  * CONTANTS
  */
-const startMarker = '<!-- START dbSchema-markdown -->';
-const endMarker ='<!-- END dbSchema-markdown -->'
+const startMarker = '<!-- START dblookup-markdown -->';
+const endMarker ='<!-- END dblookup-markdown -->'
 const sql = require('mssql')
 /**
  * Get Data from Database
@@ -16,13 +18,31 @@ async function getDataFromDb(config, queryStr) {
     try {
         await sql.connect(config)
         const q = await sql.query(queryStr)
-        sql.close()
+        await sql.close()
         return q;
     } catch (err) {
         console.log(err);
         return false
     }
 }
+
+async function  convertModelQueryToHtmlTable(config, model){  
+    await sql.connect(config, err => {
+        model.tables.forEach((t, index, array) => {
+            new sql.Request().query(t.query, (err, result) => {
+                // ... error checks
+                //console.log(tablemark(result.recordset));
+                array[index].htmlTable = tablemark(result.recordset);
+            });
+        });
+    })
+    
+    sql.on('error', err => {
+        // ... error handler
+    })
+    return model;
+}
+
 
 /**
  * Convert DbObject to Model
@@ -31,71 +51,24 @@ async function getDataFromDb(config, queryStr) {
 function convertDbObjectToModel(dbObject){
     // Create object model
     var model = {
-        entities : [],
-        catalog : ''
+        tables : []
     };
 
     // Data 
     var data = dbObject.recordset;
 
-
-    // Set Catalog name 
-    model.catalog = data[0].catalog;
-
-    // Unique Entities
-    var entities = [...new Set(data.map(a => a.name))] 
-
     // Push each entity to the model
-    entities.forEach((e)=>{
-        //var columns = getColumns(e, data);
-        var columns = data.filter(f=>f.name==e);
-        
-        var _contraints = [];
-        
-        columns.forEach((c) => {
-            // pick contraints keys from columns and add into array
-            let _constrains = Object.assign({}, ...['column','constraintName', 'constraintType', 'collectionTables', 'constraintTable', 'constraintColumn'].map(key => ({ [key]: c[key] })));
-            _contraints.push(_constrains);
-        });
-
-        var _columns = [];
-        
-        columns.forEach((c) => {
-            // omit contrains and push the colums object into array
-            let { constraintName, constraintType, collectionTables, constraintTable, constraintColumn,  ..._c } = c;            
-
-            // check if already exists
-            if (!_columns.some(s=>s.column==_c.column)){
-                _columns.push(_c);
-            }
-        });
-
-        _columns.forEach((c) => {
-             Object.assign(c, { isPK: false, isFK: false, constraints : _contraints.filter(f=>f.column==c.column)})
-
-             c.constraints.forEach((constraint) =>{
-                 if (constraint.constraintType=='PRIMARY KEY'){
-                    c.isPK = true;
-                 }
-
-                 if (constraint.constraintType=='FOREIGN KEY'){
-                    c.isFK = true;
-                 }
-             })
-         });
-
-        model.entities.push({
-            name : e,
-            schema : _columns[0].schema,
-            description : _columns[0].tableExtendedProperties,
-            columns : _columns
-        })
+    data.forEach((e)=>{
+        var table = {
+            data: e,
+            query : "Select * from " + e.tableName,
+            htmlTable : "dsa",
+         }
+        model.tables.push(table);
     })
     
     return model;
 }
-
-
 
 
 /**
@@ -105,13 +78,16 @@ function convertDbObjectToModel(dbObject){
 export async function generateMarkdownSchema(options) {
     
     // Get SQL Query
-    const queryStr = readFileSync(require.resolve('../templates/mssql/schemaGenerator.sql')).toString()
+    const queryStr = readFileSync(require.resolve('../templates/mssql/lookupGenerator.sql')).toString()
 
     const config = options.connectionString !== undefined ? options.connectionString.toString() : null;
     
     if (config == null || config == undefined){
         throw new Error(`Connection string is required`)
     }
+
+
+    
     // Get Data from Database
     const data = await getDataFromDb(config, queryStr);
 
@@ -119,14 +95,14 @@ export async function generateMarkdownSchema(options) {
         throw new Error(`Error retreiving the data from database`)
     }
 
-    // Generate the model from Database
-    const model = convertDbObjectToModel(data);
-
+    
+    const model = await convertModelQueryToHtmlTable(config, convertDbObjectToModel(data));
+    
     // Generate markdown schema
     let mdSchema = null;
 
     
-    renderFile(require.resolve('../templates/mssql/catalogue.tpl'), model, {}, function (err, str) {
+    renderFile(require.resolve('../templates/mssql/lookuptables.tpl'), model, {}, function (err, str) {
         // str => Rendered HTML string
         if (err) {
             console.log(err)
@@ -141,35 +117,6 @@ export async function generateMarkdownSchema(options) {
     }
 
 
-    model.entities.forEach((entity)  => {
-        renderFile(require.resolve('../templates/mssql/table.tpl'),  Object.assign(entity, {entities : model.entities}), {}, function (err, str) {
-            // str => Rendered HTML string
-            if (err) {
-                console.log(err)
-                return false;
-            } else {
-                mdSchema += str.toString();
-            }
-        });
-
-
-        renderFile(require.resolve('../templates/mssql/graphViz.tpl'), entity, {}, function (err, str) {
-            if (err) {
-                console.log(err)
-                return false;
-            } else {
-                const data = Buffer.from(str, 'utf8') 
-                const compressed = deflate(data, { level: 9 }) 
-                const graphVizCompressed = Buffer.from(compressed)
-                .toString('base64') 
-                .replace(/\+/g, '-').replace(/\//g, '_');
-                //mdSchema += startMarker.replace('dbSchema-markdown', entity.name) + '\r\n' + str + '\r\n\n' + endMarker.replace('dbSchema-markdown', entity.name) + '\r\n';
-                mdSchema += '\r\n' + '![alt text](https://kroki.io/erd/svg/' + graphVizCompressed + ' "' + entity.name + '")' + '\r\n';              
-                // const html = request('GET','https://kroki.io/erd/svg/' + graphVizCompressed);
-                // mdSchema += html;  
-            }
-        });
-    });
 
     var doc = startMarker + '\r\n' + mdSchema + '\r\n\n' + endMarker + '\r\n';
 

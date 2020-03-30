@@ -29,7 +29,7 @@ function safeExit(code) {
 
 function printHelp() {
   console.log(
-`Usage: dbschema-markdown [options] <connectionString>
+`Usage: dblookup-markdown [options] <connectionString>
 
 Output a Markdown document 
 
