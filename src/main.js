@@ -62,7 +62,7 @@ function convertDbObjectToModel(dbObject){
         var table = {
             data: e,
             query : "Select * from " + e.tableName,
-            htmlTable : "dsa",
+            htmlTable : "Empty table",
          }
         model.tables.push(table);
     })
