@@ -21,25 +21,26 @@ async function getDataFromDb(config, queryStr) {
         await sql.close()
         return q;
     } catch (err) {
-        console.log(err);
         return false
     }
 }
 
+
+
 async function  convertModelQueryToHtmlTable(config, model){  
-    await sql.connect(config, err => {
-        model.tables.forEach((t, index, array) => {
-            new sql.Request().query(t.query, (err, result) => {
-                // ... error checks
-                //console.log(tablemark(result.recordset));
-                array[index].htmlTable = tablemark(result.recordset);
-            });
-        });
-    })
-    
-    sql.on('error', err => {
-        // ... error handler
-    })
+        for(let t of model.tables) {
+            try {
+                if ( t.query != undefined && t.query != null){
+                    await sql.connect(config)
+                    let result = await sql.query(t.query)
+                    if (result.recordset != undefined && result.recordset != null){
+                        t.htmlTable =tablemark(result.recordset)
+                    }
+                    await sql.close()
+                }
+            } catch (error) {
+            }
+          }
     return model;
 }
 
@@ -61,8 +62,15 @@ function convertDbObjectToModel(dbObject){
     data.forEach((e)=>{
         var table = {
             data: e,
-            query : "Select * from " + e.tableName,
-            htmlTable : "Empty table",
+            query : `DECLARE @Temp NVARCHAR(MAX); 
+            DECLARE @SQL NVARCHAR(MAX);
+            
+            SET @Temp = '';
+            SELECT @Temp = @Temp + COLUMN_NAME + ', ' FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME ='${e.tableName}' AND COLUMN_NAME NOT IN ('Created', 'Guid', 'IsDeleted', 'Modified', 'ModifiedBy', 'CreatedById', 'ApplicationId')  
+            
+            SET @SQL = 'SELECT ' + SUBSTRING(@Temp, 0, LEN(@Temp)) +' FROM [${e.tableName}]';
+            EXECUTE SP_EXECUTESQL @SQL;`,
+            htmlTable : "",
          }
         model.tables.push(table);
     })
