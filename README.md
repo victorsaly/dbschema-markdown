@@ -27,13 +27,13 @@ and the output will be written to stdout.
 The schema may be retrieved from a Database endpoint:
 
 ```console
-$ dblookup-markdown "Data Source=SERVER\INSTANCE;Initial Catalog=Demo;Persist Security Info=True;User ID=APP_Demo;password=XXXXX" > schema.md
+$ dblookup-markdown "Data Source=SERVER\INSTANCE;Initial Catalog=Demo;Persist Security Info=True;User ID=APP_Demo;password=XXXXX" > lookup.md
 ```
 
 …or update existing file:
 
 ```console
-$ dblookup-markdown "Data Source=SERVER\INSTANCE;Initial Catalog=Demo;Persist Security Info=True;User ID=APP_Demo;password=XXXXX" -u "./schema.md"
+$ dblookup-markdown "Data Source=SERVER\INSTANCE;Initial Catalog=Demo;Persist Security Info=True;User ID=APP_Demo;password=XXXXX" -u "./lookup.md"
 ```
 
 If `--update-file` is given, the generated Markdown will be output to the given
@@ -64,22 +64,32 @@ Options:
 
 # Database **Demo**
 
-## dbo.Logs
-      
-| Name | Column | Type | Nullable | Default | Example | Comments    |
-|------|--------|:------------:|---------:|---------|---------|-------------|
-| Logs | ID  | int() | false |  |  | PRIMARY KEY |
-| Logs | Created  | datetime() | true | (getdate()) |  |  |
-## dbo.Users
-This is a demo, Additional Information about the Table 
+### AddressType
 
-| Name | Column | Type | Nullable | Default | Example | Comments    |
-|------|--------|:------------:|---------:|---------|---------|-------------|
-| Users | ID  | int() | false |  | Primary Key | PRIMARY KEY |
-| Users | Name  | varchar(50) | false |  | Full Name |  |
+Lookup Table For Address Types
+
+| Id    | Address type    |
+| ----- | --------------- |
+| 1     | Customer        |
+| 2     | CustomerContact |
+| 3     | Supplier        |
+| 4     | DeliveryAddress |
+
+### Application
+
+Lookup table to Identify application
+
+| Id    | Name             |
+| ----- | ---------------- |
+| 1     | Unknown          |
+| 2     | SAS              |
+| 3     | Warehouse        |
+| 4     | Warehouse Mobile |
+| 5     | Sales            |
+| 6     | Accounts         |
+| 7     | Buildroom        |
+| 8     | OnePortal        |
+| 9     | Calendar         |
 
 <!-- END dblookup-markdown -->
 
-
-[example]: https://github.com/exogen/graphbrainz/blob/master/docs/types.md
-[graphbrainz]: https://github.com/exogen/graphbrainz
