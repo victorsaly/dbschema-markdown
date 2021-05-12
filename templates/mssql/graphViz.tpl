@@ -52,7 +52,7 @@ _%>
 columns.forEach(column => { 
     column.constraints.filter(f=>f.constraintTable != null).forEach(constraint => { 
 _%>
-<%= name %> 1--* <%= constraint.constraintTable %> { label: "<%= column.column %>", size: "10"}
+<%= name %> *--1 <%= constraint.constraintTable %> { label: "<%= column.column %>", size: "10"}
 <%  
     }) 
 }) 
@@ -75,7 +75,7 @@ columns.forEach(column => {
         if (table && idx < 11){
             
 _%>
-<%= name %> *--1 <%= table %> { label: "<%= _column %>", size: "10"}
+<%= name %> 1--* <%= table %> { label: "<%= _column %>", size: "10"}
 <%          
             }
         })
