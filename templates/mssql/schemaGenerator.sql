@@ -6,6 +6,7 @@ AS
 		 ON a.object_id = b.object_id
 )
 SELECT DISTINCT
+       ISNULL((select TOP 1 ISNULL([value],'1') FROM  sys.extended_properties WHERE class = 0 AND name = 'Version'),'1') AS [dbVersion],
        t.TABLE_CATALOG AS [catalog],
        t.TABLE_NAME AS [name],
        t.TABLE_SCHEMA AS [schema],

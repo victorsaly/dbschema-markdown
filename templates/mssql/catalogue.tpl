@@ -1,1 +1,1 @@
-## Database > **<%= catalog %>**
+## Database > **<%= catalog %>** V<%= dbVersion %>
