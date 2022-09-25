@@ -1,6 +1,6 @@
 {
   "name": "dbschema-markdown",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "A CLI to bootstrap DB Schema in Markdown",
   "main": "src/index.js",
   "repository": {
