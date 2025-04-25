@@ -4,7 +4,7 @@
   "description": "A CLI to bootstrap DB Schema in Markdown",
   "main": "src/index.js",
   "repository": {
-    "url": "https://github.com/victorsaly/dbschema-markdown"
+    "url": "git+https://github.com/victorsaly/dbschema-markdown.git"
   },
   "bin": {
     "dbschema-markdown": "bin/dbschema-markdown"
